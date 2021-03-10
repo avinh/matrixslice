@@ -7,7 +7,6 @@ import (
 
 //Graph struct
 type Graph struct {
-	AdjMatrix [][]int
 	BitMatrix []int
 }
 
