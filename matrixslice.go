@@ -5,8 +5,10 @@ import (
 	"fmt"
 )
 
+//Graph struct
 type Graph struct {
 	AdjMatrix [][]int
+	BitMatrix []int
 }
 
 //New create graph
@@ -16,26 +18,23 @@ func New(size int) (Graph, error) {
 		return Graph{}, errors.New("dimensions must be non-negative")
 	}
 
-	a := make([][]int, size)
-	for i := range a {
-		a[i] = make([]int, size)
-	}
+	a := make([]int, size)
 
-	return Graph{AdjMatrix: a}, nil
+	return Graph{BitMatrix: a}, nil
 }
 
 //AddEdge edges
 func (g *Graph) AddEdge(v1, v2 uint32) error {
+	if v1 == v2 {
+		return errors.New("the same index")
+	}
 
 	if !g.inRange(v1, v2) {
 		return errors.New("index out of range")
 	}
-	if len(g.AdjMatrix[v1]) < 1 || len(g.AdjMatrix[v2]) < 1 {
-		return errors.New("Matrix is empty")
-	}
 
-	g.AdjMatrix[v1][v2] = 1
-	g.AdjMatrix[v2][v1] = 1
+	g.BitMatrix[v1] = setBit(g.BitMatrix[v1], uint(v2))
+	g.BitMatrix[v2] = setBit(g.BitMatrix[v2], uint(v1))
 
 	return nil
 }
@@ -45,11 +44,9 @@ func (g *Graph) RemoveEdge(v1, v2 uint32) error {
 	if !g.inRange(v1, v2) {
 		return errors.New("index out of range")
 	}
-	if g.AdjMatrix[v1][v2] == 0 {
-		return nil
-	}
-	g.AdjMatrix[v1][v2] = 0
-	g.AdjMatrix[v2][v1] = 0
+
+	g.BitMatrix[v1] = clearBit(g.BitMatrix[v1], uint(v2))
+	g.BitMatrix[v2] = clearBit(g.BitMatrix[v2], uint(v1))
 
 	return nil
 }
@@ -59,16 +56,13 @@ func (g *Graph) CheckEdge(index1, index2 int) (bool, error) {
 		return false, errors.New("index out of range")
 	}
 
-	a := g.AdjMatrix
-
-	if a[index1][index2] == 1 && a[index2][index1] == 1 {
+	if hasBit(g.BitMatrix[index1], uint(index2)) && hasBit(g.BitMatrix[index2], uint(index1)) {
 		return true, nil
 	}
 	return false, nil
 }
 
 func (g *Graph) GetEdges(index int) ([]int, error) {
-	a := g.AdjMatrix
 
 	if !g.inRangeOne(uint32(index)) {
 		return nil, errors.New("index out of range")
@@ -76,86 +70,44 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 
 	edge := make([]int, 0)
 
-	for i, v := range a[index] {
-		if v == 1 {
-			edge = append(edge, int(i))
+	for i, v := range g.BitMatrix {
+		if i == index && v != 0 {
+			fmt.Println(v)
+			for j := 0; j < len(g.BitMatrix); j++ {
+				check, err := g.CheckEdge(index, j)
+
+				if err != nil {
+					return nil, err
+				}
+
+				if hasBit(v, uint(j)) && check {
+					edge = append(edge, j)
+				}
+			}
 		}
 	}
 	return edge, nil
 }
 
-func (g *Graph) MergeEdgesToRow(index int, row []int) ([]int, error) {
-	if len(row) < 1 {
-		return nil, errors.New("Row is emmty")
-	}
-	s := make([]int, len(g.AdjMatrix))
-	for _, v := range row {
-		s[v] = 1
-	}
-	err := g.SetRow(index, s)
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
-}
-
-func (g *Graph) GetEdgesWithRow(row []int, index int) ([]int, error) {
-	a := g.AdjMatrix
-
-	if len(row) < 1 {
-		return nil, errors.New("Row is emmty")
-	}
-
+func (g *Graph) GetRow(index int) (int, error) {
 	if !g.inRangeOne(uint32(index)) {
-		return nil, errors.New("index out of range")
+		return 0, errors.New("index out of range")
 	}
-
-	if len(row) < len(a[index]) {
-		for i := len(row); i <= len(a[index]); i++ {
-			row = append(row, 0)
-		}
-	}
-
-	edge := make([]int, 0)
-
-	for i, v := range row {
-		if v == 1 {
-			edge = append(edge, int(i))
-		}
-	}
-
-	return edge, nil
+	return g.BitMatrix[index], nil
 }
 
-func (g *Graph) GetRow(index int) ([]int, error) {
-	if !g.inRangeOne(uint32(index)) {
-		return nil, errors.New("index out of range")
-	}
-
-	a := g.AdjMatrix
-	s := make([]int, 0)
-	for i, v := range a {
-		if index == i {
-			s = v
-		}
-	}
-
-	return s, nil
-}
-
-func (g *Graph) SetRow(index int, row []int) error {
+func (g *Graph) SetRow(index int, row int) error {
 	if !g.inRangeOne(uint32(index)) {
 		return errors.New("index out of range")
 	}
-	g.AdjMatrix[index] = row
+	g.BitMatrix[index] = row
 	return nil
 }
 
 //PrintMatrix print matrix
 func (g *Graph) PrintMatrix() {
-	for i, v := range g.AdjMatrix {
-		fmt.Println(i)
-		fmt.Println(v)
+	for i, v := range g.BitMatrix {
+		fmt.Println(i, v)
 	}
 }
 
@@ -172,5 +124,5 @@ func (g *Graph) inRangeOne(r uint32) bool {
 
 // Dim returns the (single-axis) dimension of the Graph.
 func (g *Graph) Dim() uint32 {
-	return uint32(len(g.AdjMatrix))
+	return uint32(len(g.BitMatrix))
 }

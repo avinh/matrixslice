@@ -1,3 +1,2 @@
-module github.com/avinh/matrixslice
 
-go 1.16
+module github.com/avinh/matrixslice
