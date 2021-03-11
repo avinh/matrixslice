@@ -1,19 +1,30 @@
 package matrixslice
 
-// Sets the bit at pos in the integer n.
-func setBit(n int, pos uint) int {
-	n |= (1 << pos)
-	return n
+func NewUint64(n int) []uint64 {
+	return make([]uint64, (n+63)/64)
 }
 
-// Clears the bit at pos in n.
-func clearBit(n int, pos uint) int {
-	mask := ^(1 << pos)
-	n &= mask
-	return n
+func GetBit(b []uint64, index int) bool {
+	pos := index / 64
+	j := uint(index % 64)
+	return (b[pos] & (uint64(1) << j)) != 0
 }
 
-func hasBit(n int, pos uint) bool {
-	val := n & (1 << pos)
-	return (val > 0)
+func SetBit(b []uint64, index int, value bool, scale int) []uint64 {
+	if len(b) < 1 {
+		b = NewUint64(scale)
+	}
+	pos := index / 64
+	j := uint(index % 64)
+	if value {
+		b[pos] |= (uint64(1) << j)
+	} else {
+		b[pos] &= ^(uint64(1) << j)
+	}
+
+	return b
+}
+
+func Len(b []uint64) int {
+	return 64 * len(b)
 }
