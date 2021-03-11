@@ -22,6 +22,14 @@ func New(size int) (Graph, error) {
 	return Graph{BitMatrix: a}, nil
 }
 
+func (g *Graph) Expansion(count int) {
+	if len(g.BitMatrix) < count {
+		for i := len(g.BitMatrix); i < count; i++ {
+			g.BitMatrix = append(g.BitMatrix, 0)
+		}
+	}
+}
+
 //AddEdge edges
 func (g *Graph) AddEdge(v1, v2 uint32) error {
 	if v1 == v2 {
@@ -71,7 +79,6 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 
 	for i, v := range g.BitMatrix {
 		if i == index && v != 0 {
-			fmt.Println(v)
 			for j := 0; j < len(g.BitMatrix); j++ {
 				check, err := g.CheckEdge(index, j)
 

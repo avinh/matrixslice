@@ -41,9 +41,10 @@ func main() {
 	g.GetRow(39)
 	//Set a row of matrix
 	g.SetRow(68, 39)
+	//scale matrix
+	g.Expansion(100)
 	//Print Matrix
 	g.PrintMatrix()
-
 	//Length of matrix
 	fmt.Println(g.Dim())
 }
