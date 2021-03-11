@@ -14,7 +14,7 @@ go get -u github.com/avinh/matrixslice
 
 ``` Go
 func main() {
-	g, err := matrixslice.New(70)
+	g, err := matrixslice.New(10000)
 
 	if err != nil {
 		fmt.Println("Error")
@@ -29,18 +29,18 @@ func main() {
 	g.AddEdge(37, 39)
 	g.AddEdge(38, 39)
 	g.AddEdge(39, 38)
-	g.AddEdge(69, 55)
+	g.AddEdge(40, 9998)
 
 	//Remove Edge
 	g.RemoveEdge(1, 3)
-	//Check Edge of two vertices
-	g.CheckEdge(39, 39)
+	// Check Edge of two vertices
+	fmt.Println(g.CheckEdge(1, 3))
 	//Get all Edge of a index
-	g.GetEdges(1)
+	fmt.Println(g.GetEdges(1))
 	//Get a row of matrix
-	g.GetRow(39)
+	fmt.Println(g.GetRow(1))
 	//Set a row of matrix
-	g.SetRow(68, 39)
+	g.SetRow(68, []uint64{4, 0, 0, 0, 0, 0, 0, 0, 0, 0})
 	//scale matrix
 	g.Expansion(100)
 	//Print Matrix
