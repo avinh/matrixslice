@@ -24,28 +24,31 @@ func main() {
 	g.AddEdge(1, 5)
 	g.AddEdge(1, 2)
 	g.AddEdge(2, 5)
-	g.AddEdge(5, 39)
+	g.AddEdge(1, 39)
 	g.AddEdge(36, 39)
 	g.AddEdge(37, 39)
 	g.AddEdge(38, 39)
-	g.AddEdge(39, 38)
-	g.AddEdge(40, 9998)
+	// g.AddEdge(1, 69)
+	g.AddEdge(1, 999)
+	g.AddEdge(1, 9456)
 
 	//Remove Edge
 	g.RemoveEdge(1, 3)
 	// Check Edge of two vertices
-	fmt.Println(g.CheckEdge(1, 3))
+	fmt.Println(g.CheckEdge(36, 39))
 	//Get all Edge of a index
 	fmt.Println(g.GetEdges(1))
-	//Get a row of matrix
+	// //Get a row of matrix
 	fmt.Println(g.GetRow(1))
-	//Set a row of matrix
-	g.SetRow(68, []uint64{4, 0, 0, 0, 0, 0, 0, 0, 0, 0})
-	//scale matrix
+	// //Set a row of matrix
+	g.SetRow(9999, matrixslice.BitNe{Set: []uint64{1}})
+	// //scale matrix
 	g.Expansion(100)
-	//Print Matrix
+	// //Print Matrix
 	g.PrintMatrix()
-	//Length of matrix
+	// //Length of matrix
 	fmt.Println(g.Dim())
+
+	fmt.Println(g.BitMatrix)
 }
 ```

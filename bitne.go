@@ -1,7 +1,12 @@
 package matrixslice
 
-func NewUint64(n int) []uint64 {
-	return make([]uint64, (n+63)/64)
+type BitNe struct {
+	Set []uint64
+}
+
+func NewUint64(n int) BitNe {
+	items := make([]uint64, (n+63)/64)
+	return BitNe{Set: items}
 }
 
 func GetBit(b []uint64, index int) bool {
@@ -10,16 +15,16 @@ func GetBit(b []uint64, index int) bool {
 	return (b[pos] & (uint64(1) << j)) != 0
 }
 
-func SetBit(b []uint64, index int, value bool, scale int) []uint64 {
-	if len(b) < 1 {
+func SetBit(b BitNe, index int, value bool, scale int) BitNe {
+	if len(b.Set) < 1 {
 		b = NewUint64(scale)
 	}
 	pos := index / 64
 	j := uint(index % 64)
 	if value {
-		b[pos] |= (uint64(1) << j)
+		b.Set[pos] |= (uint64(1) << j)
 	} else {
-		b[pos] &= ^(uint64(1) << j)
+		b.Set[pos] &= ^(uint64(1) << j)
 	}
 
 	return b
