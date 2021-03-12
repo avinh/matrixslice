@@ -7,7 +7,7 @@ import (
 
 //Graph struct
 type Graph struct {
-	BitMatrix []BitNe
+	BitMatrix [][]uint64
 }
 
 //New create graph
@@ -17,7 +17,7 @@ func New(size int) (Graph, error) {
 		return Graph{}, errors.New("dimensions must be non-negative")
 	}
 
-	a := make([]BitNe, size)
+	a := make([][]uint64, size)
 
 	return Graph{BitMatrix: a}, nil
 }
@@ -25,7 +25,8 @@ func New(size int) (Graph, error) {
 func (g *Graph) Expansion(count int) {
 	if len(g.BitMatrix) < count {
 		for i := len(g.BitMatrix); i < count; i++ {
-			g.BitMatrix = append(g.BitMatrix, BitNe{})
+			a := make([]uint64, 0)
+			g.BitMatrix = append(g.BitMatrix, a)
 		}
 	}
 }
@@ -65,11 +66,11 @@ func (g *Graph) CheckEdge(index1, index2 int) (bool, error) {
 		return false, errors.New("index out of range")
 	}
 
-	if len(g.BitMatrix[index1].Set) < 1 || len(g.BitMatrix[index2].Set) < 1 {
+	if len(g.BitMatrix[index1]) < 1 || len(g.BitMatrix[index2]) < 1 {
 		return false, nil
 	}
 
-	if GetBit(g.BitMatrix[index1].Set, int(index2)) && GetBit(g.BitMatrix[index2].Set, int(index1)) {
+	if GetBit(g.BitMatrix[index1], int(index2)) && GetBit(g.BitMatrix[index2], int(index1)) {
 		return true, nil
 	}
 	return false, nil
@@ -84,7 +85,7 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 	edge := make([]int, 0)
 
 	for i, v := range g.BitMatrix {
-		if i == index && len(v.Set) != 0 {
+		if i == index && len(v) != 0 {
 			for j := 0; j < len(g.BitMatrix); j++ {
 				check, err := g.CheckEdge(index, j)
 
@@ -92,7 +93,7 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 					return nil, err
 				}
 
-				if GetBit(v.Set, int(j)) && check {
+				if GetBit(v, int(j)) && check {
 					edge = append(edge, j)
 				}
 			}
@@ -101,14 +102,14 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 	return edge, nil
 }
 
-func (g *Graph) GetRow(index uint32) (BitNe, error) {
+func (g *Graph) GetRow(index uint32) ([]uint64, error) {
 	if !g.inRangeOne(uint32(index)) {
-		return BitNe{}, errors.New("index out of range")
+		return nil, errors.New("index out of range")
 	}
 	return g.BitMatrix[index], nil
 }
 
-func (g *Graph) SetRow(index uint32, row BitNe) error {
+func (g *Graph) SetRow(index uint32, row []uint64) error {
 	if !g.inRangeOne(uint32(index)) {
 		return errors.New("index out of range")
 	}

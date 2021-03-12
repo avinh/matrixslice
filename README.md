@@ -41,7 +41,7 @@ func main() {
 	// //Get a row of matrix
 	fmt.Println(g.GetRow(1))
 	// //Set a row of matrix
-	g.SetRow(9999, matrixslice.BitNe{Set: []uint64{1}})
+	g.SetRow(9999, []uint64{1})
 	// //scale matrix
 	g.Expansion(100)
 	// //Print Matrix
