@@ -28,9 +28,9 @@ func main() {
 	g.AddEdge(36, 39)
 	g.AddEdge(37, 39)
 	g.AddEdge(38, 39)
-	// g.AddEdge(1, 69)
+	g.AddEdge(1, 69)
 	g.AddEdge(1, 999)
-	g.AddEdge(1, 9456)
+	g.AddEdge(1, 9999)
 
 	//Remove Edge
 	g.RemoveEdge(1, 3)
@@ -38,17 +38,20 @@ func main() {
 	fmt.Println(g.CheckEdge(36, 39))
 	//Get all Edge of a index
 	fmt.Println(g.GetEdges(1))
-	// //Get a row of matrix
-	fmt.Println(g.GetRow(1))
-	// //Set a row of matrix
+	//Set a row of matrix
 	g.SetRow(9999, []uint64{1})
-	// //scale matrix
+	//scale matrix
 	g.Expansion(100)
-	// //Print Matrix
+	//Print Matrix
 	g.PrintMatrix()
-	// //Length of matrix
+	//Length of matrix
 	fmt.Println(g.Dim())
 
-	fmt.Println(g.BitMatrix)
+	row, err := g.GetRow(1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(row)
+	fmt.Println(g.GetEdgesFromRow(row))
 }
 ```
