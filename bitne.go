@@ -9,7 +9,7 @@ func newUint64(n int) ([]uint64, BitNe) {
 	return make([]uint64, (n+63)/64), bit
 }
 
-func (bit *BitNe) GetBit(b []uint64, index int) bool {
+func (bit *BitNe) getBit(b []uint64, index int) bool {
 	if index < bit.Length {
 		for i := 0; i < bit.Length; i++ {
 			b = append(b, 0)
@@ -20,7 +20,7 @@ func (bit *BitNe) GetBit(b []uint64, index int) bool {
 	return (b[pos] & (uint64(1) << j)) != 0
 }
 
-func (bit *BitNe) SetBit(b []uint64, index int, value bool, scale int) []uint64 {
+func (bit *BitNe) setBit(b []uint64, index int, value bool, scale int) []uint64 {
 	if len(b) < 1 {
 		b, _ = newUint64(scale)
 	} else if index < bit.Length {
@@ -47,7 +47,7 @@ func (bit *BitNe) SetBit(b []uint64, index int, value bool, scale int) []uint64 
 	return b
 }
 
-func (bit *BitNe) Len(b []uint64) int {
+func (bit *BitNe) len(b []uint64) int {
 	return 64 * len(b)
 }
 

@@ -44,9 +44,9 @@ func (g *Graph) AddEdge(v1, v2 uint32) error {
 
 	bit := BitNe{Length: len(g.BitMatrix)}
 
-	g.BitMatrix[v1] = bit.SetBit(g.BitMatrix[v1], int(v2), true, len(g.BitMatrix))
+	g.BitMatrix[v1] = bit.setBit(g.BitMatrix[v1], int(v2), true, len(g.BitMatrix))
 
-	g.BitMatrix[v2] = bit.SetBit(g.BitMatrix[v2], int(v1), true, len(g.BitMatrix))
+	g.BitMatrix[v2] = bit.setBit(g.BitMatrix[v2], int(v1), true, len(g.BitMatrix))
 
 	return nil
 }
@@ -57,8 +57,8 @@ func (g *Graph) RemoveEdge(v1, v2 uint32) error {
 		return errors.New("index out of range")
 	}
 	bit := BitNe{Length: len(g.BitMatrix)}
-	g.BitMatrix[v1] = bit.SetBit(g.BitMatrix[v1], int(v2), false, len(g.BitMatrix))
-	g.BitMatrix[v2] = bit.SetBit(g.BitMatrix[v2], int(v1), false, len(g.BitMatrix))
+	g.BitMatrix[v1] = bit.setBit(g.BitMatrix[v1], int(v2), false, len(g.BitMatrix))
+	g.BitMatrix[v2] = bit.setBit(g.BitMatrix[v2], int(v1), false, len(g.BitMatrix))
 
 	return nil
 }
@@ -72,7 +72,7 @@ func (g *Graph) CheckEdge(index1, index2 int) (bool, error) {
 		return false, nil
 	}
 	bit := BitNe{Length: len(g.BitMatrix)}
-	if bit.GetBit(g.BitMatrix[index1], int(index2)) && bit.GetBit(g.BitMatrix[index2], int(index1)) {
+	if bit.getBit(g.BitMatrix[index1], int(index2)) && bit.getBit(g.BitMatrix[index2], int(index1)) {
 		return true, nil
 	}
 	return false, nil
@@ -95,7 +95,7 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 					return nil, err
 				}
 
-				if bit.GetBit(v, int(j)) && check {
+				if bit.getBit(v, int(j)) && check {
 					edge = append(edge, j)
 				}
 			}
@@ -108,7 +108,7 @@ func (g *Graph) GetEdgesFromRow(row []uint64) ([]int, error) {
 	bit := BitNe{Length: len(g.BitMatrix)}
 	edge := make([]int, 0)
 	for i := 0; i < len(g.BitMatrix); i++ {
-		if bit.GetBit(row, int(i)) {
+		if bit.getBit(row, int(i)) {
 			edge = append(edge, i)
 		}
 	}
