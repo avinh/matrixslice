@@ -4,7 +4,7 @@ type BitNe struct {
 	Length int
 }
 
-func NewUint64(n int) ([]uint64, BitNe) {
+func newUint64(n int) ([]uint64, BitNe) {
 	bit := BitNe{Length: n}
 	return make([]uint64, (n+63)/64), bit
 }
@@ -22,7 +22,7 @@ func (bit *BitNe) GetBit(b []uint64, index int) bool {
 
 func (bit *BitNe) SetBit(b []uint64, index int, value bool, scale int) []uint64 {
 	if len(b) < 1 {
-		b, _ = NewUint64(scale)
+		b, _ = newUint64(scale)
 	} else if index < bit.Length {
 		for i := 0; i < bit.Length; i++ {
 			b = append(b, 0)
