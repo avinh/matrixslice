@@ -47,11 +47,14 @@ func main() {
 	//Length of matrix
 	fmt.Println(g.Dim())
 
+
 	row, err := g.GetRow(1)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(row)
+	
+	//Get Count row
+	fmt.Println(g.CountRow(row))
 	fmt.Println(g.GetEdgesFromRow(row))
 }
 ```

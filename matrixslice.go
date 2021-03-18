@@ -105,6 +105,11 @@ func (g *Graph) GetEdgesFromRow(row []uint64) ([]int, error) {
 	return bit.scanBit(row), nil
 }
 
+func (g *Graph) CountRow(row []uint64) int {
+	bit := BitNe{Length: len(g.BitMatrix)}
+	return len(bit.scanBit(row))
+}
+
 func (g *Graph) GetRow(index uint32) ([]uint64, error) {
 	if !g.inRangeOne(uint32(index)) {
 		return nil, errors.New("index out of range")
