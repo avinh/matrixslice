@@ -1,7 +1,5 @@
 package matrixslice
 
-import "fmt"
-
 type BitNe struct {
 	Length int
 }
@@ -19,7 +17,6 @@ func (bit *BitNe) getBit(b []uint64, index int) bool {
 			b = append(b, 0)
 		}
 	}
-	fmt.Println(pos, j, (uint64(1) << j))
 	return (b[pos] & (uint64(1) << j)) != 0
 }
 
