@@ -1,36 +1,58 @@
 package matrixslice
 
+import "fmt"
+
 type BitNe struct {
 	Length int
 }
 
 func newUint64(n int) ([]uint64, BitNe) {
-	bit := BitNe{Length: n}
+	bit := BitNe{Length: (n + 63) / 64}
 	return make([]uint64, (n+63)/64), bit
 }
 
 func (bit *BitNe) getBit(b []uint64, index int) bool {
-	if index < bit.Length {
-		for i := 0; i < bit.Length; i++ {
+	pos := index / 64
+	j := uint(index % 64)
+	if pos < ((bit.Length + 63) / 64) {
+		for i := 0; i < (bit.Length+63)/64; i++ {
 			b = append(b, 0)
 		}
 	}
-	pos := index / 64
-	j := uint(index % 64)
+	fmt.Println(pos, j, (uint64(1) << j))
 	return (b[pos] & (uint64(1) << j)) != 0
 }
 
+func (bit *BitNe) scanBit(b []uint64) []int {
+	list := make([]int, 0)
+	for i, v := range b {
+		if v != 0 {
+			for j := 0; j < 64; j++ {
+				if v&(uint64(1)<<j) != 0 {
+					res := j
+					if i != 0 {
+						res = 64*i + j
+					}
+					list = append(list, res)
+				}
+			}
+		}
+	}
+	return list
+}
+
 func (bit *BitNe) setBit(b []uint64, index int, value bool, scale int) []uint64 {
+	pos := index / 64
+	j := uint(index % 64)
+
 	if len(b) < 1 {
 		b, _ = newUint64(scale)
-	} else if index < bit.Length {
-		for i := 0; i < bit.Length; i++ {
+	} else if pos < (bit.Length+63)/64 {
+		for i := 0; i < (bit.Length+63)/64; i++ {
 			b = append(b, 0)
 		}
 	}
 
-	pos := index / 64
-	j := uint(index % 64)
 	if value {
 		b[pos] |= (uint64(1) << j)
 	} else {

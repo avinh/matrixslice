@@ -59,7 +59,6 @@ func (g *Graph) RemoveEdge(v1, v2 uint32) error {
 	bit := BitNe{Length: len(g.BitMatrix)}
 	g.BitMatrix[v1] = bit.setBit(g.BitMatrix[v1], int(v2), false, len(g.BitMatrix))
 	g.BitMatrix[v2] = bit.setBit(g.BitMatrix[v2], int(v1), false, len(g.BitMatrix))
-
 	return nil
 }
 
@@ -67,7 +66,6 @@ func (g *Graph) CheckEdge(index1, index2 int) (bool, error) {
 	if !g.inRange(uint32(index1), uint32(index2)) {
 		return false, errors.New("index out of range")
 	}
-
 	if len(g.BitMatrix[index1]) < 1 || len(g.BitMatrix[index2]) < 1 {
 		return false, nil
 	}
@@ -79,11 +77,9 @@ func (g *Graph) CheckEdge(index1, index2 int) (bool, error) {
 }
 
 func (g *Graph) GetEdges(index int) ([]int, error) {
-
 	if !g.inRangeOne(uint32(index)) {
 		return nil, errors.New("index out of range")
 	}
-
 	edge := make([]int, 0)
 	bit := BitNe{Length: len(g.BitMatrix)}
 	for i, v := range g.BitMatrix {
@@ -106,13 +102,7 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 
 func (g *Graph) GetEdgesFromRow(row []uint64) ([]int, error) {
 	bit := BitNe{Length: len(g.BitMatrix)}
-	edge := make([]int, 0)
-	for i := 0; i < len(g.BitMatrix); i++ {
-		if bit.getBit(row, int(i)) {
-			edge = append(edge, i)
-		}
-	}
-	return edge, nil
+	return bit.scanBit(row), nil
 }
 
 func (g *Graph) GetRow(index uint32) ([]uint64, error) {
