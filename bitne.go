@@ -74,3 +74,29 @@ func remove(s []uint64, i int) []uint64 {
 	s[len(s)-1], s[i] = s[i], s[len(s)-1]
 	return s[:len(s)-1]
 }
+
+func compress(list []uint64) (results []uint64) {
+	for i, v := range list {
+		if v != 0 {
+			results = append(results, uint64(i))
+			results = append(results, v)
+		}
+	}
+	return results
+}
+
+func uncompress(list []uint64) (results []uint64) {
+	var max uint64 = 0
+	for i := 0; i < len(list); i++ {
+		if i%2 == 0 && list[i] > max {
+			max = list[i]
+		}
+	}
+	resultne := make([]uint64, max+1)
+	for i, v := range list {
+		if i%2 == 0 {
+			resultne[v] = list[i+1]
+		}
+	}
+	return resultne
+}

@@ -11,7 +11,7 @@ type Graph struct {
 }
 
 //New create graph
-func New(size int) (Graph, error) {
+func New(size uint64) (Graph, error) {
 
 	if size < 0 {
 		return Graph{}, errors.New("dimensions must be non-negative")
@@ -80,21 +80,25 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 	if !g.inRangeOne(uint32(index)) {
 		return nil, errors.New("index out of range")
 	}
-	edge := make([]int, 0)
-	bit := BitNe{Length: len(g.BitMatrix)}
-	for i, v := range g.BitMatrix {
-		if i == index && len(v) != 0 {
-			for j := 0; j < len(g.BitMatrix); j++ {
-				check, err := g.CheckEdge(index, j)
+	row, err := g.GetRow(uint32(index))
+	if err != nil {
+		return nil, err
+	}
 
-				if err != nil {
-					return nil, err
-				}
+	edge, err := g.GetEdgesFromRow(row)
 
-				if bit.getBit(v, int(j)) && check {
-					edge = append(edge, j)
-				}
-			}
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]int, 0)
+	for _, v := range edge {
+		check, err := g.CheckEdge(v, index)
+		if err != nil {
+			return nil, err
+		}
+		if check {
+			results = append(results, v)
 		}
 	}
 	return edge, nil
@@ -102,11 +106,13 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 
 func (g *Graph) GetEdgesFromRow(row []uint64) ([]int, error) {
 	bit := BitNe{Length: len(g.BitMatrix)}
+	row = uncompress(row)
 	return bit.scanBit(row), nil
 }
 
 func (g *Graph) CountRow(row []uint64) int {
 	bit := BitNe{Length: len(g.BitMatrix)}
+	row = uncompress(row)
 	return len(bit.scanBit(row))
 }
 
@@ -114,13 +120,14 @@ func (g *Graph) GetRow(index uint32) ([]uint64, error) {
 	if !g.inRangeOne(uint32(index)) {
 		return nil, errors.New("index out of range")
 	}
-	return g.BitMatrix[index], nil
+	return compress(g.BitMatrix[index]), nil
 }
 
 func (g *Graph) SetRow(index uint32, row []uint64) error {
 	if !g.inRangeOne(uint32(index)) {
 		return errors.New("index out of range")
 	}
+	row = compress(row)
 	g.BitMatrix[index] = row
 	return nil
 }
