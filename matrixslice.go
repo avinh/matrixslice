@@ -32,7 +32,7 @@ func (g *Graph) Expansion(count int) {
 }
 
 //AddEdge edges
-func (g *Graph) AddEdge(v1, v2 uint32) error {
+func (g *Graph) AddEdge(v1, v2 uint64) error {
 
 	if v1 == v2 {
 		return errors.New("the same index")
@@ -42,45 +42,45 @@ func (g *Graph) AddEdge(v1, v2 uint32) error {
 		return errors.New("index out of range")
 	}
 
-	bit := BitNe{Length: len(g.BitMatrix)}
+	g.BitMatrix[v1] = setBit(g.BitMatrix[v1], v2, true)
 
-	g.BitMatrix[v1] = bit.setBit(g.BitMatrix[v1], int(v2), true, len(g.BitMatrix))
-
-	g.BitMatrix[v2] = bit.setBit(g.BitMatrix[v2], int(v1), true, len(g.BitMatrix))
+	g.BitMatrix[v2] = setBit(g.BitMatrix[v2], v1, true)
 
 	return nil
 }
 
 //RemoveEdge edges
-func (g *Graph) RemoveEdge(v1, v2 uint32) error {
+func (g *Graph) RemoveEdge(v1, v2 uint64) error {
 	if !g.inRange(v1, v2) {
 		return errors.New("index out of range")
 	}
-	bit := BitNe{Length: len(g.BitMatrix)}
-	g.BitMatrix[v1] = bit.setBit(g.BitMatrix[v1], int(v2), false, len(g.BitMatrix))
-	g.BitMatrix[v2] = bit.setBit(g.BitMatrix[v2], int(v1), false, len(g.BitMatrix))
+
+	g.BitMatrix[v1] = setBit(g.BitMatrix[v1], v2, false)
+
+	g.BitMatrix[v2] = setBit(g.BitMatrix[v2], v1, false)
+
 	return nil
 }
 
-func (g *Graph) CheckEdge(index1, index2 int) (bool, error) {
-	if !g.inRange(uint32(index1), uint32(index2)) {
+func (g *Graph) CheckEdge(index1, index2 uint64) (bool, error) {
+	if !g.inRange(uint64(index1), uint64(index2)) {
 		return false, errors.New("index out of range")
 	}
 	if len(g.BitMatrix[index1]) < 1 || len(g.BitMatrix[index2]) < 1 {
 		return false, nil
 	}
-	bit := BitNe{Length: len(g.BitMatrix)}
-	if bit.getBit(g.BitMatrix[index1], int(index2)) && bit.getBit(g.BitMatrix[index2], int(index1)) {
+
+	if getBit(g.BitMatrix[index1], index2) && getBit(g.BitMatrix[index2], index1) {
 		return true, nil
 	}
 	return false, nil
 }
 
-func (g *Graph) GetEdges(index int) ([]int, error) {
-	if !g.inRangeOne(uint32(index)) {
+func (g *Graph) GetEdges(index uint64) ([]uint64, error) {
+	if !g.inRangeOne(uint64(index)) {
 		return nil, errors.New("index out of range")
 	}
-	row, err := g.GetRow(uint32(index))
+	row, err := g.GetRow(uint64(index))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 		return nil, err
 	}
 
-	results := make([]int, 0)
+	results := make([]uint64, 0)
 	for _, v := range edge {
 		check, err := g.CheckEdge(v, index)
 		if err != nil {
@@ -104,31 +104,27 @@ func (g *Graph) GetEdges(index int) ([]int, error) {
 	return edge, nil
 }
 
-func (g *Graph) GetEdgesFromRow(row []uint64) ([]int, error) {
-	bit := BitNe{Length: len(g.BitMatrix)}
-	row = uncompress(row)
-	return bit.scanBit(row), nil
+func (g *Graph) GetEdgesFromRow(row []uint64) ([]uint64, error) {
+	return scanBit(row), nil
 }
 
 func (g *Graph) CountRow(row []uint64) int {
-	bit := BitNe{Length: len(g.BitMatrix)}
-	row = uncompress(row)
-	return len(bit.scanBit(row))
+	return len(scanBit(row))
 }
 
-func (g *Graph) GetRow(index uint32) ([]uint64, error) {
-	if !g.inRangeOne(uint32(index)) {
+func (g *Graph) GetRow(index uint64) ([]uint64, error) {
+	if !g.inRangeOne(uint64(index)) {
 		return nil, errors.New("index out of range")
 	}
-	return compress(g.BitMatrix[index]), nil
+	g.BitMatrix[index] = resize(g.BitMatrix[index])
+	return g.BitMatrix[index], nil
 }
 
-func (g *Graph) SetRow(index uint32, row []uint64) error {
-	if !g.inRangeOne(uint32(index)) {
+func (g *Graph) SetRow(index uint64, row []uint64) error {
+	if !g.inRangeOne(uint64(index)) {
 		return errors.New("index out of range")
 	}
-	row = compress(row)
-	g.BitMatrix[index] = row
+	g.BitMatrix[index] = unresize(row)
 	return nil
 }
 
@@ -140,17 +136,17 @@ func (g *Graph) PrintMatrix() {
 }
 
 // inRange returns true if (r, c) is a valid index into v.
-func (g *Graph) inRange(r, c uint32) bool {
+func (g *Graph) inRange(r, c uint64) bool {
 	n := g.Dim()
 	return (c < n) && (r < n)
 }
 
-func (g *Graph) inRangeOne(r uint32) bool {
+func (g *Graph) inRangeOne(r uint64) bool {
 	n := g.Dim()
 	return (r < n)
 }
 
 // Dim returns the (single-axis) dimension of the Graph.
-func (g *Graph) Dim() uint32 {
-	return uint32(len(g.BitMatrix))
+func (g *Graph) Dim() uint64 {
+	return uint64(len(g.BitMatrix))
 }
