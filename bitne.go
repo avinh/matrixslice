@@ -32,8 +32,8 @@ func setBit(b []uint64, index uint64, value bool) []uint64 {
 	pos := index / 64
 	j := uint(index % 64)
 
-	if uint64(len(b)) < (index+63)/64 {
-		for i := len(b); uint64(i) < ((index+63)/64 + 1); i++ {
+	if uint64(len(b)) < (index+64)/64 {
+		for i := len(b); uint64(i) < (index+64)/64; i++ {
 			b = append(b, 0)
 		}
 	}
