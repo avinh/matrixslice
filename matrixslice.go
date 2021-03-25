@@ -5,14 +5,14 @@ import (
 	"fmt"
 )
 
-var rangene uint64 = 64000000
+const rangene uint64 = 64000000
 
 type Graph struct {
 	BitMatrix [][][]uint64
 }
 
 func New() Graph {
-	a := make([][][]uint64, 64000000)
+	a := make([][][]uint64, rangene)
 	return Graph{BitMatrix: a}
 }
 
@@ -52,8 +52,8 @@ func (g *Graph) AddEdge(v1, v2 uint64) error {
 
 func (g *Graph) RemoveEdge(v1, v2 uint64) error {
 
-	pos1 := v1 / 64000000
-	pos2 := v2 / 64000000
+	pos1 := v1 / rangene
+	pos2 := v2 / rangene
 
 	v1s := v1
 	if pos1 > 0 {
@@ -82,8 +82,8 @@ func (g *Graph) RemoveEdge(v1, v2 uint64) error {
 }
 
 func (g *Graph) CheckEdge(v1, v2 uint64) (bool, error) {
-	pos1 := v1 / 64000000
-	pos2 := v2 / 64000000
+	pos1 := v1 / rangene
+	pos2 := v2 / rangene
 
 	v2s := v2
 	if pos2 > 0 {
@@ -145,28 +145,33 @@ func (g *Graph) CountRow(row []uint64) int {
 }
 
 func (g *Graph) GetRow(index uint64) ([]uint64, error) {
-	pos := index / 64000000
+	pos := index / rangene
 
 	if len(g.BitMatrix[pos]) < 1 {
 		return []uint64{}, nil
 	}
 
 	if pos > 0 {
-		index = uint64(index % 64000000)
+		index = uint64(index % rangene)
 	}
 
 	g.BitMatrix[pos][index] = resize(g.BitMatrix[pos][index])
 	return g.BitMatrix[pos][index], nil
 }
 
-func (g *Graph) SetRow(index uint64, row []uint64) error {
-	pos := index / 64000000
+func (g *Graph) SetRow(v uint64, row []uint64) error {
+	pos := v / rangene
 
 	if len(g.BitMatrix[pos]) < 1 {
 		g.BitMatrix[pos] = make([][]uint64, rangene)
 	}
 
-	g.BitMatrix[pos][index] = unresize(row)
+	vs := v
+	if pos > 0 {
+		vs = uint64(v % rangene)
+	}
+
+	g.BitMatrix[pos][vs] = unresize(row)
 	return nil
 }
 
