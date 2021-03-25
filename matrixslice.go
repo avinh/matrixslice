@@ -24,6 +24,11 @@ func (g *Graph) AddEdge(v1, v2 uint64) error {
 	pos1 := v1 / rangene
 	pos2 := v2 / rangene
 
+	v1s := v1
+	if pos1 > 0 {
+		v1s = uint64(v1 % rangene)
+	}
+
 	v2s := v2
 	if pos2 > 0 {
 		v2s = uint64(v2 % rangene)
@@ -33,20 +38,12 @@ func (g *Graph) AddEdge(v1, v2 uint64) error {
 		g.BitMatrix[pos2] = make([][]uint64, rangene)
 	}
 
-	v1s := v1
-	if pos1 > 0 {
-		v1s = uint64(v1 % rangene)
-	}
-
 	if len(g.BitMatrix[pos1]) < 1 {
 		g.BitMatrix[pos1] = make([][]uint64, rangene)
 	}
 
-	bit1 := setBit(g.BitMatrix[pos1][v1s], v2, true)
-	bit2 := setBit(g.BitMatrix[pos2][v2s], v1, true)
-
-	g.BitMatrix[pos1][v1s] = bit1
-	g.BitMatrix[pos2][v2s] = bit2
+	g.BitMatrix[pos1][v1s] = setBit(g.BitMatrix[pos1][v1s], v2, true)
+	g.BitMatrix[pos2][v2s] = setBit(g.BitMatrix[pos2][v2s], v1, true)
 	return nil
 }
 
