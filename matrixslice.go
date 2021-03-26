@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const rangene uint64 = 64000000
+const rangene uint64 = 6400000
 
 type Graph struct {
 	BitMatrix [][][]uint64
@@ -28,6 +28,9 @@ func (g *Graph) AddEdge(v1, v2 uint64) error {
 	if pos1 > 0 {
 		v1s = uint64(v1 % rangene)
 	}
+	if len(g.BitMatrix[pos1]) < 1 {
+		g.BitMatrix[pos1] = make([][]uint64, rangene)
+	}
 
 	v2s := v2
 	if pos2 > 0 {
@@ -38,12 +41,22 @@ func (g *Graph) AddEdge(v1, v2 uint64) error {
 		g.BitMatrix[pos2] = make([][]uint64, rangene)
 	}
 
-	if len(g.BitMatrix[pos1]) < 1 {
-		g.BitMatrix[pos1] = make([][]uint64, rangene)
+	c := make(chan struct{})
+
+	go func() {
+		g.BitMatrix[pos1][v1s] = setBit(g.BitMatrix[pos1][v1s], v2, true)
+		c <- struct{}{}
+	}()
+
+	go func() {
+		g.BitMatrix[pos2][v2s] = setBit(g.BitMatrix[pos2][v2s], v1, true)
+		c <- struct{}{}
+	}()
+
+	for i := 0; i < 2; i++ {
+		<-c
 	}
 
-	g.BitMatrix[pos1][v1s] = setBit(g.BitMatrix[pos1][v1s], v2, true)
-	g.BitMatrix[pos2][v2s] = setBit(g.BitMatrix[pos2][v2s], v1, true)
 	return nil
 }
 
@@ -70,11 +83,22 @@ func (g *Graph) RemoveEdge(v1, v2 uint64) error {
 		return errors.New("index out of range")
 	}
 
-	bit1 := setBit(g.BitMatrix[pos1][v1s], v2, false)
-	bit2 := setBit(g.BitMatrix[pos2][v2s], v1, false)
+	c := make(chan struct{})
 
-	g.BitMatrix[pos1][v1s] = bit1
-	g.BitMatrix[pos2][v2s] = bit2
+	go func() {
+		g.BitMatrix[pos1][v1s] = setBit(g.BitMatrix[pos1][v1s], v2, false)
+		c <- struct{}{}
+	}()
+
+	go func() {
+		g.BitMatrix[pos2][v2s] = setBit(g.BitMatrix[pos2][v2s], v1, false)
+		c <- struct{}{}
+	}()
+
+	for i := 0; i < 2; i++ {
+		<-c
+	}
+
 	return nil
 }
 
@@ -99,7 +123,6 @@ func (g *Graph) CheckEdge(v1, v2 uint64) (bool, error) {
 	if len(g.BitMatrix[pos1][v1s]) < 1 || len(g.BitMatrix[pos2][v2s]) < 1 {
 		return false, nil
 	}
-
 	if getBit(g.BitMatrix[pos1][v1s], v2) && getBit(g.BitMatrix[pos2][v2s], v1) {
 		return true, nil
 	}
@@ -119,7 +142,9 @@ func (g *Graph) GetEdges(index uint64) ([]uint64, error) {
 	}
 
 	results := make([]uint64, 0)
+
 	for _, v := range edge {
+
 		check, err := g.CheckEdge(v, index)
 		if err != nil {
 			return nil, err
@@ -128,17 +153,17 @@ func (g *Graph) GetEdges(index uint64) ([]uint64, error) {
 			results = append(results, v)
 		}
 	}
-	return nil, nil
+	return results, nil
 }
 
 func (g *Graph) GetEdgesFromRow(row []uint64) ([]uint64, error) {
-	row = unresize(row)
-	return scanBit(row), nil
+	rowUnresize := unresize(row)
+	return scanBit(rowUnresize), nil
 }
 
 func (g *Graph) CountRow(row []uint64) int {
-	row = unresize(row)
-	return len(scanBit(row))
+	rowUnresize := unresize(row)
+	return len(scanBit(rowUnresize))
 }
 
 func (g *Graph) GetRow(index uint64) ([]uint64, error) {
@@ -152,8 +177,8 @@ func (g *Graph) GetRow(index uint64) ([]uint64, error) {
 		index = uint64(index % rangene)
 	}
 
-	g.BitMatrix[pos][index] = resize(g.BitMatrix[pos][index])
-	return g.BitMatrix[pos][index], nil
+	dataresize := resize(g.BitMatrix[pos][index])
+	return dataresize, nil
 }
 
 func (g *Graph) SetRow(v uint64, row []uint64) error {

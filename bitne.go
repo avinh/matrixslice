@@ -17,6 +17,7 @@ func scanBit(b []uint64) []uint64 {
 			for j := 0; j < 64; j++ {
 				if v&(uint64(1)<<j) != 0 {
 					res := j
+
 					if i != 0 {
 						res = 64*i + j
 					}
