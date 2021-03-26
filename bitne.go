@@ -6,7 +6,7 @@ func newUint64(n uint64) []uint64 {
 
 func getBit(b []uint64, index uint64) bool {
 	pos := index / 64
-	j := uint(index % 64)
+	j := uint64(index % 64)
 	return (b[pos] & (uint64(1) << j)) != 0
 }
 
@@ -17,6 +17,7 @@ func scanBit(b []uint64) []uint64 {
 			for j := 0; j < 64; j++ {
 				if v&(uint64(1)<<j) != 0 {
 					res := j
+
 					if i != 0 {
 						res = 64*i + j
 					}
@@ -32,19 +33,25 @@ func setBit(b []uint64, index uint64, value bool) []uint64 {
 	pos := index / 64
 	j := uint(index % 64)
 
-	if uint64(len(b)) < (index+64)/64 {
-		for i := len(b); uint64(i) < (index+64)/64; i++ {
-			b = append(b, 0)
+	temp := make([]uint64, (index+64)/64)
+
+	if (len(b)) > len(temp) {
+		temp = b
+	}
+
+	for i, v := range b {
+		if v != 0 && uint64(len(b)) < (index+64)/64 {
+			temp[i] = v
 		}
 	}
 
 	if value {
-		b[pos] |= (uint64(1) << j)
+		temp[pos] |= (uint64(1) << j)
 	} else {
-		b[pos] &= ^(uint64(1) << j)
+		temp[pos] &= ^(uint64(1) << j)
 	}
 
-	return b
+	return temp
 }
 
 func bitLen(b []uint64) int {
