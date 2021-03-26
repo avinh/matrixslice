@@ -2,6 +2,7 @@
 
 Sparse matrix representation of unweighted graphs in Go, and splitting to index, helping in limited memory storage for example in Dynamodb
 
+Support relationship up to 10 billion or more
 
 ### Installation
 With Go installed, package installation is performed using go get.
