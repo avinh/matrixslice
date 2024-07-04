@@ -71,7 +71,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/[your_username]/matrixslice"
+	"github.com/avinh/matrixslice"
 )
 
 func main() {
